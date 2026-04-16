@@ -18,8 +18,6 @@ This version includes the following enhancements:
 - **Improved Layout**: Reorganized the page layout for better space efficiency:
   - Explore section at the top (full width)
   - Open tabs and Saved for later side-by-side below
-- **Cleaner Footer**: Simplified footer attribution
-- **Color Consistency**: Explore cards now use the same neutral styling as Open tabs cards for a cohesive design
 
 ---
 

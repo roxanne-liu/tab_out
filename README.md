@@ -42,7 +42,8 @@ This version includes the following enhancements:
 **1. Clone the repo**
 
 ```bash
-git clone https://github.com/zarazhangrui/tab-out.git
+git clone https://github.com/roxanne-liu/tab_out.git
+cd tab_out
 ```
 
 **2. Load the Chrome extension**

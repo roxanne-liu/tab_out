@@ -22,6 +22,8 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
+.hidden { display: none !important; }
+
 body {
   font-family: 'DM Sans', sans-serif;
   background: var(--paper);
@@ -564,6 +566,11 @@ header {
   color: var(--status-abandoned);
 }
 
+.action-btn.close-all-btn {
+  font-size: 11px;
+  padding: 3px 10px;
+}
+
 /* ---- Toast notification ---- */
 .toast {
   position: fixed;
@@ -891,14 +898,96 @@ footer { animation: fadeUp 0.5s ease 0.65s both; }
 /* ---- Two-column layout ---- */
 .dashboard-columns {
   display: flex;
+  flex-wrap: wrap;
   gap: 32px;
   align-items: flex-start;
+}
+
+/* Recommended websites section - full width above the columns */
+.recommended-section {
+  flex: 0 0 100%;
+  width: 100%;
+  margin-bottom: 0;
+}
+
+.recommended-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.recommended-card {
+  background: var(--card-bg);
+  border: 1px solid var(--warm-gray);
+  border-radius: 8px;
+  padding: 20px;
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.recommended-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--warm-gray);
+}
+
+.recommended-card:hover {
+  box-shadow: 0 4px 20px var(--shadow);
+  transform: translateY(-1px);
+}
+
+.recommended-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.recommended-favicon {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.recommended-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.recommended-title {
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--ink);
+  margin-bottom: 4px;
+  letter-spacing: -0.2px;
+}
+
+.recommended-description {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+
+.recommended-meta {
+  font-size: 12px;
+  color: var(--status-active);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 /* Open tabs column keeps the grid layout */
 .dashboard-columns .active-section {
   flex: 1;
-  min-width: 600px;
+  min-width: 0;
 }
 
 /* Saved for later column — fixed width on the right, scrolls independently */
@@ -914,7 +1003,7 @@ footer { animation: fadeUp 0.5s ease 0.65s both; }
 /* On narrow screens, stack vertically */
 @media (max-width: 800px) {
   .dashboard-columns {
-    flex-direction: column;
+    grid-template-columns: 1fr;
   }
   .deferred-column {
     width: 100%;
@@ -988,6 +1077,13 @@ footer { animation: fadeUp 0.5s ease 0.65s both; }
   text-overflow: ellipsis;
   white-space: nowrap;
   transition: color 0.15s;
+}
+
+.deferred-title .deferred-favicon {
+  width: 14px;
+  height: 14px;
+  vertical-align: -2px;
+  margin-right: 4px;
 }
 
 .deferred-title:hover {
@@ -1155,4 +1251,10 @@ footer { animation: fadeUp 0.5s ease 0.65s both; }
   color: var(--muted);
   opacity: 0.6;
   flex-shrink: 0;
+}
+
+.no-results {
+  font-size: 12px;
+  color: var(--muted);
+  padding: 8px 0;
 }

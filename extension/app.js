@@ -199,25 +199,79 @@ async function closeTabOutDupes() {
 
 
 /* ----------------------------------------------------------------
-   SAVED FOR LATER — chrome.storage.local
+   QUICK ACCESS — Most Visited + Recently Visited
 
-   Replaces the old server-side SQLite + REST API with Chrome's
-   built-in key-value storage. Data persists across browser sessions
-   and doesn't require a running server.
-
-   Data shape stored under the "deferred" key:
-   [
-     {
-       id: "1712345678901",          // timestamp-based unique ID
-       url: "https://example.com",
-       title: "Example Page",
-       savedAt: "2026-04-04T10:00:00.000Z",  // ISO date string
-       completed: false,             // true = checked off (archived)
-       dismissed: false              // true = dismissed without reading
-     },
-     ...
-   ]
+   Shows a mix of your most frequently visited websites and recently
+   visited sites, similar to Google's default new tab page behavior.
    ---------------------------------------------------------------- */
+
+/**
+ * renderRecommendedSection()
+ *
+ * Renders the "Explore" section with most visited websites.
+ */
+async function renderRecommendedSection() {
+  const section = document.getElementById('recommendedSection');
+  const grid = document.getElementById('recommendedGrid');
+
+  if (!section || !grid) return;
+
+  try {
+    // Get most visited sites
+    const topSites = await chrome.topSites.get();
+
+    // Filter and process top sites
+    const filteredTopSites = topSites
+      .filter(site => {
+        const url = site.url || '';
+        // Skip Chrome internal pages and unwanted URLs
+        return !url.startsWith('chrome://') &&
+               !url.startsWith('chrome-extension://') &&
+               !url.startsWith('about:') &&
+               !url.startsWith('edge://') &&
+               !url.startsWith('brave://') &&
+               !url.startsWith('file://') &&
+               !url.includes('localhost') &&
+               !url.includes('127.0.0.1');
+      })
+      .slice(0, 8) // Take top 8 most visited
+      .map(site => ({
+        url: site.url,
+        title: site.title || new URL(site.url).hostname,
+        domain: new URL(site.url).hostname.replace(/^www\./, '')
+      }));
+
+    if (filteredTopSites.length === 0) {
+      // Fallback to a message if no sites are available
+      grid.innerHTML = '<div style="text-align: center; color: var(--muted); padding: 20px;">No browsing history available</div>';
+      section.style.display = 'block';
+      return;
+    }
+
+    grid.innerHTML = filteredTopSites.map(site => {
+      const faviconUrl = `https://www.google.com/s2/favicons?domain=${site.domain}&sz=16`;
+
+      return `
+        <div class="recommended-card clickable" data-action="open-recommended" data-url="${site.url}">
+          <div class="recommended-content">
+            <img class="recommended-favicon" src="${faviconUrl}" alt="">
+            <div class="recommended-info">
+              <div class="recommended-title">${site.title}</div>
+              <div class="recommended-description">${site.domain}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    section.style.display = 'block';
+
+  } catch (error) {
+    console.warn('[tab-out] Could not load browsing data:', error);
+    // Fallback: hide the section if data access fails
+    section.style.display = 'none';
+  }
+}
 
 /**
  * saveTabForLater(tab)
@@ -769,7 +823,7 @@ function buildOverflowChips(hiddenTabs, urlCounts = {}) {
     try { domain = new URL(tab.url).hostname; } catch {}
     const faviconUrl = domain ? `https://www.google.com/s2/favicons?domain=${domain}&sz=16` : '';
     return `<div class="page-chip clickable${chipClass}" data-action="focus-tab" data-tab-url="${safeUrl}" title="${safeTitle}">
-      ${faviconUrl ? `<img class="chip-favicon" src="${faviconUrl}" alt="" onerror="this.style.display='none'">` : ''}
+      ${faviconUrl ? `<img class="chip-favicon" src="${faviconUrl}" alt="">` : ''}
       <span class="chip-text">${label}</span>${dupeTag}
       <div class="chip-actions">
         <button class="chip-action chip-save" data-action="defer-single-tab" data-tab-url="${safeUrl}" data-tab-title="${safeTitle}" title="Save for later">
@@ -782,8 +836,8 @@ function buildOverflowChips(hiddenTabs, urlCounts = {}) {
     </div>`;
   }).join('');
 
-  return `
-    <div class="page-chips-overflow" style="display:none">${hiddenChips}</div>
+    return `
+    <div class="page-chips-overflow hidden">${hiddenChips}</div>
     <div class="page-chip page-chip-overflow clickable" data-action="expand-chips">
       <span class="chip-text">+${hiddenTabs.length} more</span>
     </div>`;
@@ -819,7 +873,7 @@ function renderDomainCard(group) {
   </span>`;
 
   const dupeBadge = hasDupes
-    ? `<span class="open-tabs-badge" style="color:var(--accent-amber);background:rgba(200,113,58,0.08);">
+    ? `<span class="open-tabs-badge badge-amber">
         ${totalExtras} duplicate${totalExtras !== 1 ? 's' : ''}
       </span>`
     : '';
@@ -850,7 +904,7 @@ function renderDomainCard(group) {
     try { domain = new URL(tab.url).hostname; } catch {}
     const faviconUrl = domain ? `https://www.google.com/s2/favicons?domain=${domain}&sz=16` : '';
     return `<div class="page-chip clickable${chipClass}" data-action="focus-tab" data-tab-url="${safeUrl}" title="${safeTitle}">
-      ${faviconUrl ? `<img class="chip-favicon" src="${faviconUrl}" alt="" onerror="this.style.display='none'">` : ''}
+      ${faviconUrl ? `<img class="chip-favicon" src="${faviconUrl}" alt="">` : ''}
       <span class="chip-text">${label}</span>${dupeTag}
       <div class="chip-actions">
         <button class="chip-action chip-save" data-action="defer-single-tab" data-tab-url="${safeUrl}" data-tab-title="${safeTitle}" title="Save for later">
@@ -974,7 +1028,7 @@ function renderDeferredItem(item) {
       <input type="checkbox" class="deferred-checkbox" data-action="check-deferred" data-deferred-id="${item.id}">
       <div class="deferred-info">
         <a href="${item.url}" target="_blank" rel="noopener" class="deferred-title" title="${(item.title || '').replace(/"/g, '&quot;')}">
-          <img src="${faviconUrl}" alt="" style="width:14px;height:14px;vertical-align:-2px;margin-right:4px" onerror="this.style.display='none'">${item.title || item.url}
+          <img src="${faviconUrl}" alt="" class="deferred-favicon">${item.title || item.url}
         </a>
         <div class="deferred-meta">
           <span>${domain}</span>
@@ -1020,11 +1074,8 @@ function renderArchiveItem(item) {
  * 6. Renders the "Saved for Later" checklist
  */
 async function renderStaticDashboard() {
-  // --- Header ---
-  const greetingEl = document.getElementById('greeting');
-  const dateEl     = document.getElementById('dateDisplay');
-  if (greetingEl) greetingEl.textContent = getGreeting();
-  if (dateEl)     dateEl.textContent     = getDateDisplay();
+  // --- Render recommended websites section ---
+  await renderRecommendedSection();
 
   // --- Fetch tabs ---
   await fetchOpenTabs();
@@ -1150,7 +1201,7 @@ async function renderStaticDashboard() {
 
   if (domainGroups.length > 0 && openTabsSection) {
     if (openTabsSectionTitle) openTabsSectionTitle.textContent = 'Open tabs';
-    openTabsSectionCount.innerHTML = `${domainGroups.length} domain${domainGroups.length !== 1 ? 's' : ''} &nbsp;&middot;&nbsp; <button class="action-btn close-tabs" data-action="close-all-open-tabs" style="font-size:11px;padding:3px 10px;">${ICONS.close} Close all ${realTabs.length} tabs</button>`;
+    openTabsSectionCount.innerHTML = `${domainGroups.length} domain${domainGroups.length !== 1 ? 's' : ''} &nbsp;&middot;&nbsp; <button class="action-btn close-tabs close-all-btn" data-action="close-all-open-tabs">${ICONS.close} Close all ${realTabs.length} tabs</button>`;
     openTabsMissionsEl.innerHTML = domainGroups.map(g => renderDomainCard(g)).join('');
     openTabsSection.style.display = 'block';
   } else if (openTabsSection) {
@@ -1433,6 +1484,19 @@ document.addEventListener('click', async (e) => {
   }
 });
 
+// ---- Open recommended website ----
+document.addEventListener('click', async (e) => {
+  const actionEl = e.target.closest('[data-action="open-recommended"]');
+  if (!actionEl) return;
+
+  const url = actionEl.dataset.url;
+  if (!url) return;
+
+  // Open in new tab
+  await chrome.tabs.create({ url });
+  showToast('Opening website...');
+});
+
 // ---- Archive toggle — expand/collapse the archive section ----
 document.addEventListener('click', (e) => {
   const toggle = e.target.closest('#archiveToggle');
@@ -1469,7 +1533,7 @@ document.addEventListener('input', async (e) => {
     );
 
     archiveList.innerHTML = results.map(item => renderArchiveItem(item)).join('')
-      || '<div style="font-size:12px;color:var(--muted);padding:8px 0">No results</div>';
+      || '<div class="no-results">No results</div>';
   } catch (err) {
     console.warn('[tab-out] Archive search failed:', err);
   }
@@ -1479,4 +1543,12 @@ document.addEventListener('input', async (e) => {
 /* ----------------------------------------------------------------
    INITIALIZE
    ---------------------------------------------------------------- */
+
+// Handle image loading errors globally
+document.addEventListener('error', (e) => {
+  if (e.target.tagName === 'IMG') {
+    e.target.style.display = 'none';
+  }
+}, true);
+
 renderDashboard();

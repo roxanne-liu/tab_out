@@ -1,6 +1,8 @@
-# Tab Out
+# Tab Out 1.0.1
 
 **Keep tabs on your tabs.**
+
+> **Fork Notice**: This is a community fork of [Tab Out](https://github.com/zarazhangrui/tab-out) by Zara. Thank you to the original creator!
 
 Tab Out is a Chrome extension that replaces your new tab page with a dashboard of everything you have open. Tabs are grouped by domain, with homepages (Gmail, X, LinkedIn, etc.) pulled into their own group. Close tabs with a satisfying swoosh + confetti.
 
@@ -8,21 +10,23 @@ No server. No account. No external API calls. Just a Chrome extension.
 
 ---
 
-## Install with a coding agent
+## What's Different in This Fork (v1.0.1)
 
-Send your coding agent (Claude Code, Codex, etc.) this repo and say **"install this"**:
+This version includes the following enhancements:
 
-```
-https://github.com/zarazhangrui/tab-out
-```
-
-The agent will walk you through it. Takes about 1 minute.
+- **Explore Section**: A new "Explore" section displays your most visited websites at the top of the dashboard, similar to Google's new tab page
+- **Improved Layout**: Reorganized the page layout for better space efficiency:
+  - Explore section at the top (full width)
+  - Open tabs and Saved for later side-by-side below
+- **Cleaner Footer**: Simplified footer attribution
+- **Color Consistency**: Explore cards now use the same neutral styling as Open tabs cards for a cohesive design
 
 ---
 
 ## Features
 
 - **See all your tabs at a glance** on a clean grid, grouped by domain
+- **Explore most visited sites** discover frequently visited websites without searching
 - **Homepages group** pulls Gmail inbox, X home, YouTube, LinkedIn, GitHub homepages into one card
 - **Close tabs with style** with swoosh sound + confetti burst
 - **Duplicate detection** flags when you have the same page open twice, with one-click cleanup

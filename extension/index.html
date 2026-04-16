@@ -54,14 +54,14 @@
        ================================================================ -->
   <div class="dashboard-columns" id="dashboardColumns">
 
-    <!-- LEFT COLUMN: Open tabs -->
-    <div class="active-section" id="openTabsSection" style="display:none">
+    <!-- RECOMMENDED WEBSITES SECTION -->
+    <div class="recommended-section" id="recommendedSection">
       <div class="section-header">
-        <h2 id="openTabsSectionTitle">Right now</h2>
+        <h2>Explore</h2>
         <div class="section-line"></div>
-        <div class="section-count" id="openTabsSectionCount"></div>
+        <div class="section-count">Most visited sites</div>
       </div>
-      <div class="missions" id="openTabsMissions"></div>
+      <div class="recommended-grid" id="recommendedGrid"></div>
     </div>
 
     <!-- RIGHT COLUMN: Saved for Later checklist -->
@@ -94,6 +94,16 @@
       </div>
     </div>
 
+    <!-- LEFT COLUMN: Open tabs -->
+    <div class="active-section" id="openTabsSection" style="display:none">
+      <div class="section-header">
+        <h2 id="openTabsSectionTitle">Right now</h2>
+        <div class="section-line"></div>
+        <div class="section-count" id="openTabsSectionCount"></div>
+      </div>
+      <div class="missions" id="openTabsMissions"></div>
+    </div>
+
   </div><!-- end .dashboard-columns -->
 
   <!-- ================================================================
@@ -107,7 +117,7 @@
       </div>
     </div>
     <div class="last-refresh">
-      <span style="color: var(--muted); font-size: 11px;"><a href="https://github.com/zarazhangrui/tab-out" target="_top" style="color: var(--muted); text-decoration: underline; text-underline-offset: 2px;">Tab Out</a> by <a href="https://x.com/zarazhangrui" target="_top" style="color: var(--muted); text-decoration: underline; text-underline-offset: 2px;">Zara</a></span>
+      <span style="color: var(--muted); font-size: 11px;"><a href="https://github.com/zarazhangrui/tab-out" target="_top" style="color: var(--muted); text-decoration: underline; text-underline-offset: 2px;">Tab Out</a></span>
     </div>
   </footer>
 
@@ -127,7 +137,7 @@
 
 <!-- Personal config (gitignored) — defines LOCAL_LANDING_PAGE_PATTERNS etc. -->
 <!-- If the file doesn't exist, that's fine — app.js uses sensible defaults. -->
-<script src="config.local.js" onerror="/* no personal config, that's fine */"></script>
+<script src="config.local.js"></script>
 
 <!-- Main dashboard logic — loads last so the DOM is ready -->
 <script src="app.js"></script>

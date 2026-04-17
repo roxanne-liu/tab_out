@@ -1552,3 +1552,8 @@ document.addEventListener('error', (e) => {
 }, true);
 
 renderDashboard();
+
+// Refresh the Explore section every 5 seconds to show recently visited sites
+setInterval(() => {
+  renderRecommendedSection();
+}, 5000);
